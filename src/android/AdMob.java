@@ -50,6 +50,7 @@ public class AdMob extends CordovaPlugin {
     private static final String ACTION_DESTROY_BANNER_VIEW = "destroyBannerView";
     private static final String ACTION_REQUEST_AD = "requestAd";
     private static final String ACTION_SHOW_AD = "showAd";
+    private static final String ACTION_MOVE_AD = "moveAd";
     
     private static final String ACTION_CREATE_INTERSTITIAL_VIEW = "createInterstitialView";
     private static final String ACTION_REQUEST_INTERSTITIAL_AD = "requestInterstitialAd";
@@ -65,9 +66,6 @@ public class AdMob extends CordovaPlugin {
 	private static final String OPT_IS_TESTING = "isTesting";
 	private static final String OPT_AD_EXTRAS = "adExtras";
 	private static final String OPT_AUTO_SHOW = "autoShow";
-	private static final String OPT_SET_POSITION = "setPosition";
-	private static final String OPT_AD_X = "adX";
-	private static final String OPT_AD_Y = "adY";
 	
     /** The adView to display to the user. */
     private AdView adView;
@@ -89,9 +87,6 @@ public class AdMob extends CordovaPlugin {
 	private boolean bannerShow = true;
 	private JSONObject adExtras = null;
 	private boolean autoShow = true;
-	private boolean setPosition = false;
-	private int adX = 0;
-	private int adY = 0;
 	
 	private boolean autoShowBanner = true;
 	private boolean autoShowInterstitial = true;
@@ -147,6 +142,10 @@ public class AdMob extends CordovaPlugin {
             boolean show = inputs.optBoolean(0);
             result = executeShowAd(show, callbackContext);
             
+        } else if (ACTION_MOVE_AD.equals(action)) {
+        	JSONObject options = inputs.optJSONObject(0);
+            result = executeMoveAd(options, callbackContext);
+            
         } else if (ACTION_SHOW_INTERSTITIAL_AD.equals(action)) {
             boolean show = inputs.optBoolean(0);
             result = executeShowInterstitialAd(show, callbackContext);
@@ -182,9 +181,6 @@ public class AdMob extends CordovaPlugin {
     	if(options.has(OPT_IS_TESTING)) this.isTesting  = options.optBoolean( OPT_IS_TESTING );
     	if(options.has(OPT_AD_EXTRAS)) this.adExtras  = options.optJSONObject( OPT_AD_EXTRAS );
     	if(options.has(OPT_AUTO_SHOW)) this.autoShow  = options.optBoolean( OPT_AUTO_SHOW );
-    	if(options.has(OPT_SET_POSITION)) this.setPosition  = options.optBoolean( OPT_SET_POSITION );
-    	if(options.has(OPT_AD_X)) this.adX = options.optInt( OPT_AD_X );
-    	if(options.has(OPT_AD_Y)) this.adY = options.optInt( OPT_AD_Y );
     }
     
     /**
@@ -225,11 +221,6 @@ public class AdMob extends CordovaPlugin {
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                             RelativeLayout.LayoutParams.MATCH_PARENT,
                             RelativeLayout.LayoutParams.MATCH_PARENT);
-                    if(setPosition) {
-                    	Log.w(LOGTAG, String.format("setPosition: %s", adX+" "+adY));
-                    	params.leftMargin = adX;
-                    	params.topMargin = adY;
-                    }
                     ((ViewGroup) webView.getRootView()).addView(adViewLayout, params);
                 }
                 
@@ -446,6 +437,38 @@ public class AdMob extends CordovaPlugin {
         return null;
     }
     
+    /**
+     * Parses the move ad input parameters and runs the move ad action on
+     * the UI thread.
+     *
+     * @param inputs The JSONArray representing input parameters.  This function
+     *        expects the first object in the array to be a JSONObject with the
+     *        input parameters.
+     * @return A PluginResult representing whether or not an ad was moved
+     *         succcessfully.
+     */
+    private PluginResult executeMoveAd(JSONObject options, final CallbackContext callbackContext) throws JSONException {
+
+        if(adView == null) {
+            return new PluginResult(Status.ERROR, "adView is null, call createBannerView first.");
+        }
+        
+        final int xPos = options.getInt("xPos");
+        final int yPos = options.getInt("yPos");
+        
+        cordova.getActivity().runOnUiThread(new Runnable(){
+			@Override
+            public void run() {
+				Log.w(LOGTAG, "Moving ad to "+xPos+" "+yPos);
+				adView.setX(xPos);
+				adView.setY(yPos);
+				if(callbackContext != null) callbackContext.success();
+            }
+        });
+        
+        return null;
+    }
+    
     private PluginResult executeShowInterstitialAd(final boolean show, final CallbackContext callbackContext) {
 
         if(interstitialAd == null) {
@@ -464,7 +487,6 @@ public class AdMob extends CordovaPlugin {
         
         return null;
     }
-
     
     /**
      * This class implements the AdMob ad listener events.  It forwards the events
