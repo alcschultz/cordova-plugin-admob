@@ -10,6 +10,7 @@
 - (void) __createBanner;
 - (void) __showAd:(BOOL)show;
 - (void) __showInterstitial:(BOOL)show;
+- (void) __moveAd:(NSDictionary*) options;
 - (GADRequest*) __buildAdRequest;
 - (NSString*) __md5: (NSString*) s;
 
@@ -201,6 +202,28 @@
     }
     
 	[self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
+- (void)moveAd:(CDVInvokedUrlCommand *)command {
+    NSLog(@"moveAd");
+    
+    CDVPluginResult *pluginResult;
+    NSString *callbackId = command.callbackId;
+    NSArray* args = command.arguments;
+    
+    if(! self.bannerView) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"adView is null, call createBannerView first."];
+    }
+    
+    NSUInteger argc = [arguments count];
+    if (argc >= 1) {
+        NSDictionary* options = [command.arguments objectAtIndex:0 withDefault:[NSNull null]];
+        NSUInteger *xPos = [options objectForKey:@"xPos"];
+        NSUInteger *yPos = [options objectForKey:@"yPos"];
+        bannerView.center = CGPointMake(xPos,yPos);
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
 }
 
 - (void)showInterstitialAd:(CDVInvokedUrlCommand *)command {
