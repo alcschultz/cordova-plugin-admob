@@ -51,7 +51,7 @@ admobExport.setOptions =
 			  );
 	  } else {
 		  if(typeof failureCallback === 'function') {
-			  failureCallback('options.publisherId should be specified.')
+			  failureCallback('options.publisherId should be specified.');
 		  }
 	  }
 	};

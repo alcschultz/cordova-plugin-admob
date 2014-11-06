@@ -65,7 +65,10 @@ public class AdMob extends CordovaPlugin {
 	private static final String OPT_IS_TESTING = "isTesting";
 	private static final String OPT_AD_EXTRAS = "adExtras";
 	private static final String OPT_AUTO_SHOW = "autoShow";
-    
+	private static final String OPT_SET_POSITION = "setPosition";
+	private static final String OPT_AD_X = "adX";
+	private static final String OPT_AD_Y = "adY";
+	
     /** The adView to display to the user. */
     private AdView adView;
     /** if want banner view overlap webview, we will need this layout */
@@ -86,6 +89,9 @@ public class AdMob extends CordovaPlugin {
 	private boolean bannerShow = true;
 	private JSONObject adExtras = null;
 	private boolean autoShow = true;
+	private boolean setPosition = false;
+	private float adX = 0.0;
+	private float adY = 0.0;
 	
 	private boolean autoShowBanner = true;
 	private boolean autoShowInterstitial = true;
@@ -176,6 +182,9 @@ public class AdMob extends CordovaPlugin {
     	if(options.has(OPT_IS_TESTING)) this.isTesting  = options.optBoolean( OPT_IS_TESTING );
     	if(options.has(OPT_AD_EXTRAS)) this.adExtras  = options.optJSONObject( OPT_AD_EXTRAS );
     	if(options.has(OPT_AUTO_SHOW)) this.autoShow  = options.optBoolean( OPT_AUTO_SHOW );
+    	if(options.has(OPT_SET_POSITION)) this.setPosition  = options.optBoolean( OPT_SET_POSITION );
+    	if(options.has(OPT_AD_X)) this.adX = Float(options.optDouble( OPT_AD_X ) );
+    	if(options.has(OPT_AD_Y)) this.adY = Float(options.optDouble( OPT_AD_Y ) );
     }
     
     /**
@@ -216,6 +225,11 @@ public class AdMob extends CordovaPlugin {
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                             RelativeLayout.LayoutParams.MATCH_PARENT,
                             RelativeLayout.LayoutParams.MATCH_PARENT);
+                    if(setPosition) {
+                    	Log.w(LOGTAG, String.format("setPosition: %s", adX+" "+adY));
+                    	params.marginLeft(adX);
+                    	params.marginTop(adY);
+                    }
                     ((ViewGroup) webView.getRootView()).addView(adViewLayout, params);
                 }
                 
