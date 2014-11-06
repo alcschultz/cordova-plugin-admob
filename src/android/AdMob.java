@@ -90,8 +90,8 @@ public class AdMob extends CordovaPlugin {
 	private JSONObject adExtras = null;
 	private boolean autoShow = true;
 	private boolean setPosition = false;
-	private float adX = 0.0;
-	private float adY = 0.0;
+	private int adX = 0;
+	private int adY = 0;
 	
 	private boolean autoShowBanner = true;
 	private boolean autoShowInterstitial = true;
@@ -183,8 +183,8 @@ public class AdMob extends CordovaPlugin {
     	if(options.has(OPT_AD_EXTRAS)) this.adExtras  = options.optJSONObject( OPT_AD_EXTRAS );
     	if(options.has(OPT_AUTO_SHOW)) this.autoShow  = options.optBoolean( OPT_AUTO_SHOW );
     	if(options.has(OPT_SET_POSITION)) this.setPosition  = options.optBoolean( OPT_SET_POSITION );
-    	if(options.has(OPT_AD_X)) this.adX = Float(options.optDouble( OPT_AD_X ) );
-    	if(options.has(OPT_AD_Y)) this.adY = Float(options.optDouble( OPT_AD_Y ) );
+    	if(options.has(OPT_AD_X)) this.adX = options.optInt( OPT_AD_X );
+    	if(options.has(OPT_AD_Y)) this.adY = options.optInt( OPT_AD_Y );
     }
     
     /**
@@ -227,8 +227,8 @@ public class AdMob extends CordovaPlugin {
                             RelativeLayout.LayoutParams.MATCH_PARENT);
                     if(setPosition) {
                     	Log.w(LOGTAG, String.format("setPosition: %s", adX+" "+adY));
-                    	params.marginLeft(adX);
-                    	params.marginTop(adY);
+                    	params.leftMargin = adX;
+                    	params.topMargin = adY;
                     }
                     ((ViewGroup) webView.getRootView()).addView(adViewLayout, params);
                 }
