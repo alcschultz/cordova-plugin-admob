@@ -225,6 +225,30 @@ function( show, successCallback, failureCallback) {
 	);
 };
 
+/*
+ * Move Ad.
+ * 
+ * @param {!Object} options The position used to move an ad.
+ * @param {function()} successCallback The function to call if an ad was
+ *        moved successfully.
+ * @param {function()} failureCallback The function to call if an ad failed
+ *        to be moved.
+ */
+admobExport.moveAd = 
+function( options, successCallback, failureCallback) {
+    if (options === undefined) {
+       options = {xPos:0,yPos:0};
+    }
+
+    cordova.exec(
+        successCallback,
+        failureCallback, 
+        'AdMob', 
+        'moveAd', 
+        [ options ]
+    );
+};
+
 admobExport.showInterstitialAd = 
 	function( show, successCallback, failureCallback) {
 		if (show === undefined) {
