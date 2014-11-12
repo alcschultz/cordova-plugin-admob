@@ -219,8 +219,14 @@
         NSDictionary* options = [command.arguments objectAtIndex:0 withDefault:[NSNull null]];
         
         CGFloat xPos = [[options objectForKey:@"xPos"] doubleValue];
-        CGFloat yPos = [[options objectForKey:@"yPos"] doubleValue];
-        self.bannerView.center = CGPointMake(xPos,yPos);
+        CGFloat yPos = [[options objectForKey:@"yPos"] doubleValue];\
+        
+        CGRect frame = self.bannerView.frame;
+        
+        frame.origin.x = xPos;
+        frame.origin.y = yPos;
+        
+        self.bannerView.frame = frame;
     }
     
     [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
