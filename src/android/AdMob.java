@@ -19,10 +19,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.content.Context;
 import android.os.Bundle;
 
 import java.util.Iterator;
@@ -63,6 +67,7 @@ public class AdMob extends CordovaPlugin {
 	private static final String OPT_BANNER_AT_TOP = "bannerAtTop";
 	private static final String OPT_OVERLAP = "overlap";
 	private static final String OPT_OFFSET_TOPBAR = "offsetTopBar";
+	private static final String OPT_FOOTER_OFFSET = "footerOffset";
 	private static final String OPT_IS_TESTING = "isTesting";
 	private static final String OPT_AD_EXTRAS = "adExtras";
 	private static final String OPT_AUTO_SHOW = "autoShow";
@@ -83,6 +88,7 @@ public class AdMob extends CordovaPlugin {
     /** Whether or not the banner will overlap the webview instead of push it up or down */
     private boolean bannerOverlap = false;
     private boolean offsetTopBar = false;
+    private int footerOffset = 0;
 	private boolean isTesting = false;
 	private boolean bannerShow = true;
 	private JSONObject adExtras = null;
@@ -178,6 +184,7 @@ public class AdMob extends CordovaPlugin {
     	if(options.has(OPT_BANNER_AT_TOP)) this.bannerAtTop = options.optBoolean( OPT_BANNER_AT_TOP );
     	if(options.has(OPT_OVERLAP)) this.bannerOverlap = options.optBoolean( OPT_OVERLAP );
     	if(options.has(OPT_OFFSET_TOPBAR)) this.offsetTopBar = options.optBoolean( OPT_OFFSET_TOPBAR );
+    	if(options.has(OPT_FOOTER_OFFSET)) this.footerOffset = options.optInt( OPT_FOOTER_OFFSET );
     	if(options.has(OPT_IS_TESTING)) this.isTesting  = options.optBoolean( OPT_IS_TESTING );
     	if(options.has(OPT_AD_EXTRAS)) this.adExtras  = options.optJSONObject( OPT_AD_EXTRAS );
     	if(options.has(OPT_AUTO_SHOW)) this.autoShow  = options.optBoolean( OPT_AUTO_SHOW );
@@ -221,6 +228,7 @@ public class AdMob extends CordovaPlugin {
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                             RelativeLayout.LayoutParams.MATCH_PARENT,
                             RelativeLayout.LayoutParams.MATCH_PARENT);
+                    
                     ((ViewGroup) webView.getRootView()).addView(adViewLayout, params);
                 }
                 
@@ -237,7 +245,7 @@ public class AdMob extends CordovaPlugin {
         
         return null;
     }
-    
+
     private PluginResult executeDestroyBannerView(CallbackContext callbackContext) {
 	  	Log.w(LOGTAG, "executeDestroyBannerView");
 	  	
@@ -409,9 +417,18 @@ public class AdMob extends CordovaPlugin {
                         RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(
                             RelativeLayout.LayoutParams.MATCH_PARENT,
                             RelativeLayout.LayoutParams.WRAP_CONTENT);
-                        params2.addRule(bannerAtTop ? RelativeLayout.ALIGN_PARENT_TOP : RelativeLayout.ALIGN_PARENT_BOTTOM);
+                        if(footerOffset > 0) {
+                        	float scale = cordova.getActivity().getResources().getDisplayMetrics().density;
+                        	float height = cordova.getActivity().getResources().getDisplayMetrics().heightPixels;
+                        	float dy = (height- (footerOffset*scale)) - (footerOffset*scale);
+                        	adView.setY(dy);
+                        } else {
+                        	params2.addRule(bannerAtTop ? RelativeLayout.ALIGN_PARENT_TOP : RelativeLayout.ALIGN_PARENT_BOTTOM);
+                        }
+                        
                         adViewLayout.addView(adView, params2);
                         adViewLayout.bringToFront();
+                        
                     } else {
                         ViewGroup parentView = (ViewGroup) webView.getParent();
                         if (bannerAtTop) {
