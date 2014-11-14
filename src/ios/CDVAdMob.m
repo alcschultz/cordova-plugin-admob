@@ -29,7 +29,7 @@
 @synthesize interstitialView = interstitialView_;
 
 @synthesize publisherId, interstitialAdId, adSize;
-@synthesize bannerAtTop, bannerOverlap, offsetTopBar;
+@synthesize bannerAtTop, bannerOverlap, offsetTopBar, footerOffset;
 @synthesize isTesting, adExtras;
 
 @synthesize bannerIsVisible, bannerIsInitialized;
@@ -44,6 +44,7 @@
 #define OPT_BANNER_AT_TOP   @"bannerAtTop"
 #define OPT_OVERLAP         @"overlap"
 #define OPT_OFFSET_TOPBAR   @"offsetTopBar"
+#define OPT_FOOTER_OFFSET   @"footerOffset"
 #define OPT_IS_TESTING      @"isTesting"
 #define OPT_AD_EXTRAS       @"adExtras"
 #define OPT_AUTO_SHOW       @"autoShow"
@@ -73,6 +74,7 @@
     bannerOverlap = false;
     offsetTopBar = false;
     isTesting = false;
+    footerOffset = 0;
     
     autoShow = true;
     autoShowBanner = true;
@@ -219,7 +221,7 @@
         NSDictionary* options = [command.arguments objectAtIndex:0 withDefault:[NSNull null]];
         
         CGFloat xPos = [[options objectForKey:@"xPos"] doubleValue];
-        CGFloat yPos = [[options objectForKey:@"yPos"] doubleValue];\
+        CGFloat yPos = [[options objectForKey:@"yPos"] doubleValue];
         
         CGRect frame = self.bannerView.frame;
         
@@ -361,6 +363,9 @@
     
     str = [options objectForKey:OPT_OFFSET_TOPBAR];
     if(str) offsetTopBar = [str boolValue];
+    
+    str = [options objectForKey:OPT_FOOTER_OFFSET];
+    if(str) footerOffset = [str longLongValue];
     
     str = [options objectForKey:OPT_IS_TESTING];
     if(str) isTesting = [str boolValue];
@@ -548,6 +553,8 @@
             if(! bannerOverlap) wf.size.height -= bf.size.height;
             
             bf.origin.x = (pr.size.width - bf.size.width) * 0.5f;
+            
+            if(footerOffset > 0) bf.origin.y = bf.origin.y-footerOffset;
             
             self.bannerView.frame = bf;
             

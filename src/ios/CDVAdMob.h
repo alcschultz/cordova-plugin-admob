@@ -29,6 +29,7 @@
 @property (assign) BOOL bannerAtTop;
 @property (assign) BOOL bannerOverlap;
 @property (assign) BOOL offsetTopBar;
+@property (assign) int footerOffset;
 
 @property (assign) BOOL isTesting;
 @property (nonatomic, retain) NSDictionary* adExtras;
